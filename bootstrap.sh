@@ -209,14 +209,21 @@ install_omz() {
   local home zshrc
   home=$(getent passwd "$USER_NAME" | cut -d: -f6)
   [[ -n "$home" && -d "$home" ]] || die "home directory for ${USER_NAME} not found"
+  zshrc="$home/.zshrc"
+  # A failed install leaves the clone without a zshrc; the next run would skip it.
+  if [[ -d "$home/.oh-my-zsh" ]] && ! grep -q 'oh-my-zsh.sh' "$zshrc" 2>/dev/null; then
+    log "Removing incomplete Oh My Zsh install"
+    rm -rf "$home/.oh-my-zsh"
+  fi
   if [[ ! -d "$home/.oh-my-zsh" ]]; then
     log "Installing Oh My Zsh"
+    # install.sh does `cd -` after the clone. sudo -u keeps root's cwd (/root),
+    # which the target user cannot enter, so start in the user's home.
     sudo -u "$USER_NAME" -H env RUNZSH=no CHSH=no \
-      bash -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
+      bash -c 'cd "$HOME" && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
   else
     log "Oh My Zsh already installed"
   fi
-  zshrc="$home/.zshrc"
   if [[ -f "$zshrc" ]] && grep -q '^plugins=' "$zshrc"; then
     sed -i 's/^plugins=.*/plugins=(git docker docker-compose)/' "$zshrc"
   else
