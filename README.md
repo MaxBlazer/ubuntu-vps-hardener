@@ -6,18 +6,8 @@
 
 ## Запуск
 
-Скопируйте `bootstrap.sh` на сервер и выполните:
-
 ```bash
-bash bootstrap.sh \
-  --user maxblazer \
-  --ssh-key 'ssh-ed25519 AAAA... comment'
-```
-
-Либо, когда файл лежит в репозитории:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/<user>/<repo>/main/bootstrap.sh | bash -s -- \
+curl -fsSL https://raw.githubusercontent.com/MaxBlazer/ubuntu-vps-hardener/refs/heads/master/bootstrap.sh | bash -s -- \
   --user maxblazer \
   --ssh-key 'ssh-ed25519 AAAA... comment'
 ```
